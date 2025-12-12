@@ -1,12 +1,19 @@
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
+'use client';
 
-export default async function CenteredLayout(props: { children: React.ReactNode }) {
-  const { userId } = await auth();
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/libs/AuthContext';
 
-  if (userId) {
-    redirect('/dashboard');
-  }
+export default function CenteredLayout(props: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    // If already authenticated, redirect to dashboard
+    if (!isLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center">

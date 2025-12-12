@@ -162,5 +162,10 @@
     "message_title": "Message",
     "message_description": "Enter a detailed message for your todo.",
     "submit_button": "Submit"
+  },
+  "Workflows": {
+    "meta_title": "Workflow Editor",
+    "meta_description": "Create and manage your automated workflows with our visual n8n-style editor"
   }
 }
+

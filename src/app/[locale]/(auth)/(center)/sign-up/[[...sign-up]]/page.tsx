@@ -1,22 +1,19 @@
-import { SignUp } from '@clerk/nextjs';
-import { getTranslations } from 'next-intl/server';
+'use client';
 
-import { getI18nPath } from '@/utils/Helpers';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-export async function generateMetadata(props: { params: { locale: string } }) {
-  const t = await getTranslations({
-    locale: props.params.locale,
-    namespace: 'SignUp',
-  });
+export default function SignUpRedirect() {
+  const router = useRouter();
+  
+  useEffect(() => {
+    // Redirect to sign-in page which has both tabs
+    router.replace('/sign-in');
+  }, [router]);
 
-  return {
-    title: t('meta_title'),
-    description: t('meta_description'),
-  };
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-orange-50">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+    </div>
+  );
 }
-
-const SignUpPage = (props: { params: { locale: string } }) => (
-  <SignUp path={getI18nPath('/sign-up', props.params.locale)} />
-);
-
-export default SignUpPage;

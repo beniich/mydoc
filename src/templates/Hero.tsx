@@ -1,7 +1,5 @@
-import { GitHubLogoIcon, TwitterLogoIcon } from '@radix-ui/react-icons';
 import { useTranslations } from 'next-intl';
 
-import { badgeVariants } from '@/components/ui/badgeVariants';
 import { buttonVariants } from '@/components/ui/buttonVariants';
 import { CenteredHero } from '@/features/landing/CenteredHero';
 import { Section } from '@/features/landing/Section';
@@ -13,16 +11,10 @@ export const Hero = () => {
     <Section className="py-36">
       <CenteredHero
         banner={(
-          <a
-            className={badgeVariants()}
-            href="https://twitter.com/ixartz"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <TwitterLogoIcon className="mr-1 size-5" />
-            {' '}
-            {t('follow_twitter')}
-          </a>
+          <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-1.5 text-sm text-white">
+            <span>🔧</span>
+            <span>Automate your workflows with n8n</span>
+          </div>
         )}
         title={t.rich('title', {
           important: chunks => (
@@ -36,17 +28,17 @@ export const Hero = () => {
           <>
             <a
               className={buttonVariants({ size: 'lg' })}
-              href="https://github.com/ixartz/SaaS-Boilerplate"
+              href="/sign-up"
             >
               {t('primary_button')}
             </a>
 
             <a
               className={buttonVariants({ variant: 'outline', size: 'lg' })}
-              href="https://github.com/ixartz/SaaS-Boilerplate"
+              href="/dashboard/workflows"
             >
-              <GitHubLogoIcon className="mr-2 size-5" />
-              {t('secondary_button')}
+              <span className="mr-2">🔧</span>
+              View Workflows
             </a>
           </>
         )}

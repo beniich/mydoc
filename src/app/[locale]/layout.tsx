@@ -4,8 +4,9 @@ import type { Metadata } from 'next';
 import { NextIntlClientProvider, useMessages } from 'next-intl';
 import { unstable_setRequestLocale } from 'next-intl/server';
 
-import { DemoBadge } from '@/components/DemoBadge';
+import { AuthProvider } from '@/libs/AuthContext';
 import { AllLocales } from '@/utils/AppConfig';
+import { ThemeProvider } from '@/components/ThemeProviders';
 
 export const metadata: Metadata = {
   icons: [
@@ -45,22 +46,23 @@ export default function RootLayout(props: {
   // Using internationalization in Client Components
   const messages = useMessages();
 
-  // The `suppressHydrationWarning` in <html> is used to prevent hydration errors caused by `next-themes`.
-  // Solution provided by the package itself: https://github.com/pacocoursey/next-themes?tab=readme-ov-file#with-app
-
-  // The `suppressHydrationWarning` attribute in <body> is used to prevent hydration errors caused by Sentry Overlay,
-  // which dynamically adds a `style` attribute to the body tag.
   return (
     <html lang={props.params.locale} suppressHydrationWarning>
       <body className="bg-background text-foreground antialiased" suppressHydrationWarning>
-        {/* PRO: Dark mode support for Shadcn UI */}
         <NextIntlClientProvider
           locale={props.params.locale}
           messages={messages}
         >
-          {props.children}
-
-          <DemoBadge />
+          <AuthProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {props.children}
+            </ThemeProvider>
+          </AuthProvider>
         </NextIntlClientProvider>
       </body>
     </html>
