@@ -188,3 +188,26 @@ export const withAuth = <P extends object>(Component: React.ComponentType<P>) =>
     return <Component {...props} />;
   };
 };
+
+export const RequireRole = ({ children, roles }: { children: ReactNode; roles: ('doctor' | 'patient')[] }) => {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      if (user.role && !roles.includes(user.role)) {
+        // Redirect to a default page or show restricted access
+        router.push('/dashboard'); 
+        // Ideally should show a toaster or "Access Denied" page
+      }
+    }
+  }, [user, isLoading, roles, router]);
+
+  if (isLoading) return null; // Or a spinner
+
+  if (!user || (user.role && !roles.includes(user.role))) {
+    return null; // Or render "Access Denied" component
+  }
+
+  return <>{children}</>;
+};

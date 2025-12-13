@@ -69,7 +69,7 @@ const Sidebar = ({ activeItem, setActiveItem, userRole }: { activeItem: string; 
 
   let displayMains = [...baseMains];
 
-  if (userRole === 'client') {
+  if (userRole === 'patient') {
       displayMains = baseMains.filter(item => ['overview', 'schedule'].includes(item.id));
       displayMains.push({ id: 'doctors', label: 'Find a Doctor', icon: Stethoscope });
   } else if (userRole === 'doctor') {
@@ -439,8 +439,8 @@ export default function DashboardPage() {
   const { user, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   
-  // Role toggler state for demonstration
-  const [userRole, setUserRole] = useState<'admin' | 'doctor' | 'client'>('admin');
+  // Use real user role or default to 'doctor' if undefined (safe fallback)
+  const userRole = user?.role || 'doctor';
   
   // Toast State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -462,7 +462,7 @@ export default function DashboardPage() {
       {/* Toast Notification */}
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
 
-      {/* Sidebar - Conditional based on role could be added here, keeping default for now */}
+      {/* Sidebar */}
       <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} userRole={userRole} />
 
       {/* Main Content */}
@@ -480,16 +480,8 @@ export default function DashboardPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             </div>
 
-            {/* Role Switcher (Demo Only) */}
-             <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-lg border border-border">
-                <button onClick={() => setUserRole('admin')} className={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${userRole === 'admin' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>Admin</button>
-                <button onClick={() => setUserRole('doctor')} className={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${userRole === 'doctor' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>Docteur</button>
-                <button onClick={() => setUserRole('client')} className={`px-3 py-1 text-xs font-medium rounded-md transition-all cursor-pointer ${userRole === 'client' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>Client</button>
-             </div>
-
-
             {/* Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 ml-auto">
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                 className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors cursor-pointer active:scale-95"
@@ -524,40 +516,39 @@ export default function DashboardPage() {
         {/* Content Area */}
         <main className="p-6">
           {/* Render based on Role, then by Active Item */}
-          {userRole === 'admin' && (
+          {/* Default/Admin View (showing mostly admin stuff for 'doctor' as well if logic overlaps, or distinct) */}
+          {(userRole === 'admin' || userRole === 'doctor') && (
               <>
-                {activeItem === 'overview' && <OverviewContent onAction={handleShowToast} />}
-                {activeItem === 'leaderboard' && <LeaderboardContent />}
-                {activeItem === 'spreadsheets' && <SpreadsheetsContent onAction={handleShowToast} />}
-                {activeItem === 'administration' && <AdministrationContent onAction={handleShowToast} />}
-                {activeItem === 'sales' && <SalesContent onAction={handleShowToast} />}
+                {/* Doctor View Overrides */}
+                {userRole === 'doctor' && activeItem === 'overview' ? <DoctorDashboard onAction={handleShowToast} /> :
+                 /* Admin/Default Overview */
+                 activeItem === 'overview' ? <OverviewContent onAction={handleShowToast} /> : null
+                }
+                
+                {/* Shared Views */}
                 {activeItem === 'schedule' && <ScheduleContent onAction={handleShowToast} />}
                 {activeItem === 'messages' && <MessagesContent />}
                 {activeItem === 'library' && <LibraryContent />}
                 {activeItem === 'settings' && <SettingsContent onAction={handleShowToast} />}
                 
-                {/* Fallback for others not yet custom built */}
+                {/* Admin Only Views */}
+                {userRole === 'admin' && (
+                    <>
+                        {activeItem === 'leaderboard' && <LeaderboardContent />}
+                        {activeItem === 'spreadsheets' && <SpreadsheetsContent onAction={handleShowToast} />}
+                        {activeItem === 'administration' && <AdministrationContent onAction={handleShowToast} />}
+                        {activeItem === 'sales' && <SalesContent onAction={handleShowToast} />}
+                    </>
+                )}
+
+                {/* Fallback */}
                 {['support'].includes(activeItem) && (
                     <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />
                 )}
               </>
           )}
 
-          {userRole === 'doctor' && (
-              // Doctor sees specialized dashboard for overview, but might reuse schedule
-               <>
-                {activeItem === 'overview' ? <DoctorDashboard onAction={handleShowToast} /> : 
-                 activeItem === 'schedule' ? <ScheduleContent onAction={handleShowToast} /> :
-                 activeItem === 'messages' ? <MessagesContent /> :
-                 activeItem === 'library' ? <LibraryContent /> :
-                 activeItem === 'settings' ? <SettingsContent onAction={handleShowToast} /> :
-                 /* Fallback */
-                 <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />
-                }
-               </>
-          )}
-
-           {userRole === 'client' && (
+           {userRole === 'patient' && (
               // Client sees specialized dashboard
                <>
                 {activeItem === 'overview' ? <ClientDashboard /> : 
@@ -566,8 +557,7 @@ export default function DashboardPage() {
                  activeItem === 'library' ? <LibraryContent /> :
                  activeItem === 'settings' ? <SettingsContent onAction={handleShowToast} /> :
                  activeItem === 'doctors' ? <DoctorsList onAction={handleShowToast} /> :
-                 /* Client typically has restricted access, so we might redirect or show simplified views. 
-                    For now, reusing placeholder for non-overview. */
+                 /* Client typically has restricted access */
                  <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />
                 }
                </>

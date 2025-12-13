@@ -45,9 +45,26 @@ export const AIAssistantModal: React.FC<AIAssistantModalProps> = ({
     if (!prompt.trim()) return;
     
     setIsLoading(true);
-    // Simulate AI response
+    // Simulate AI processing delay
     await new Promise(resolve => setTimeout(resolve, 1500));
-    setResponse(`Analyse IA pour ${patientName || 'le patient'} :\n\nBasé sur les informations fournies, voici mon analyse :\n\n• Les symptômes décrits sont cohérents avec le diagnostic actuel\n• Le traitement en cours semble approprié\n• Recommandation : continuer le suivi régulier\n\n⚠️ Cette analyse est fournie à titre indicatif. Le diagnostic final appartient au médecin.`);
+
+    let responseContent = `Analyse IA pour ${patientName || 'le patient'} :\n\n`;
+
+    if (prompt.startsWith('Analyser ordonnance')) {
+        responseContent += `📋 **Analyse de l'ordonnance**\n\n• **Médicaments chiffrés** : Amlodipine 5mg, Aspirine 100mg\n• **Interactions** : Aucune interaction majeure détectée.\n• **Posologie** : Conforme aux standards pour l'hypertension.\n• **Vigilance** : Surveiller la fonction rénale dans 3 mois.`;
+    } else if (prompt.startsWith('Scanner / ECG')) {
+        responseContent += `🖼️ **Analyse d'Imagerie / ECG**\n\n• **Observations** : Rythme sinusal régulier. Absence de signes d'ischémie aiguë.\n• **Anomalies** : Légère hypertrophie ventriculaire gauche suggérée.\n• **Recommandation** : Échocardiographie de contrôle conseillée.`;
+    } else if (prompt.startsWith('Résumer dossier')) {
+        responseContent += `📂 **Résumé du Dossier Patient**\n\n• **Antécédents** : Hypertension (2020), Diabète type 2 (2018).\n• **Dernière consultation** : 15/10/2025 - Motif : Suivi trimestriel.\n• **Traitement actuel** : Metformine, Amlodipine.\n• **Statut** : Stable.`;
+    } else if (prompt.startsWith('Diagnostic assisté')) {
+        responseContent += `🩺 **Aide au Diagnostic**\n\nBasé sur les symptômes décrits :\n1. **Hypothèse principale** : Migraine ophtalmique (Probabilité : 85%)\n2. **Diagnostic différentiel** : Algie vasculaire de la face.\n• **Suggestion** : Vérifier la tension oculaire et prescrire un triptan si confirmé.`;
+    } else {
+        responseContent += `Basé sur les informations fournies, voici mon analyse :\n\n• Les symptômes décrits sont cohérents avec le diagnostic actuel\n• Le traitement en cours semble approprié\n• Recommandation : continuer le suivi régulier`;
+    }
+
+    responseContent += `\n\n⚠️ Cette analyse est fournie à titre indicatif. Le diagnostic final appartient au médecin.`;
+    
+    setResponse(responseContent);
     setIsLoading(false);
   };
 

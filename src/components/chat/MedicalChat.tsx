@@ -22,10 +22,12 @@ const MedicalChat: React.FC = () => {
     
     if (userRole === 'doctor') return true; // Doctors see all
     if (userRole === 'patient') {
-       // Patients only see their own conversation (assuming ID match logic or just showing single doctor chat)
-       // For mock purposes, let's say patient 'p1' logs in.
-       // In a real app, check conv.participants.some(p => p.id === user.id)
-       return true; 
+       // Secure Access: Patients only see their own conversations
+       // Matching logic: Check if participant ID matches user ID OR (for demo) if email contains patient name
+       return _conv.participants.some(p => 
+         p.id === user.id || 
+         (user.email && user.email.toLowerCase().includes(p.name.split(' ')[0].toLowerCase()))
+       );
     }
     return true; 
   });
