@@ -8,7 +8,7 @@ interface User {
   email: string;
   name: string;
   organization?: string;
-  role?: 'doctor' | 'patient'; // Added role for chat RBAC
+  role?: 'doctor' | 'patient' | 'admin'; // Added role for chat RBAC
 }
 
 interface AuthContextType {
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // Get stored users
     const storedUsers = localStorage.getItem('workflow_weaver_users');
-    const users: Record<string, { passwordHash: string; name: string; organization?: string; role?: 'doctor' | 'patient' }> = 
+    const users: Record<string, { passwordHash: string; name: string; organization?: string; role?: 'doctor' | 'patient' | 'admin' }> = 
       storedUsers ? JSON.parse(storedUsers) : {};
 
     const passwordHash = simpleHash(password);
@@ -81,12 +81,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
-  const signUp = async (email: string, password: string, name: string, role: 'doctor' | 'patient' = 'patient'): Promise<boolean> => {
+  const signUp = async (email: string, password: string, name: string, role: 'doctor' | 'patient' | 'admin' = 'patient'): Promise<boolean> => {
     setIsLoading(true);
 
     // Get stored users
     const storedUsers = localStorage.getItem('workflow_weaver_users');
-    const users: Record<string, { passwordHash: string; name: string; organization?: string; role?: 'doctor' | 'patient' }> = 
+    const users: Record<string, { passwordHash: string; name: string; organization?: string; role?: 'doctor' | 'patient' | 'admin' }> = 
       storedUsers ? JSON.parse(storedUsers) : {};
 
     // Check if user already exists
@@ -189,7 +189,7 @@ export const withAuth = <P extends object>(Component: React.ComponentType<P>) =>
   };
 };
 
-export const RequireRole = ({ children, roles }: { children: ReactNode; roles: ('doctor' | 'patient')[] }) => {
+export const RequireRole = ({ children, roles }: { children: ReactNode; roles: ('doctor' | 'patient' | 'admin')[] }) => {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 

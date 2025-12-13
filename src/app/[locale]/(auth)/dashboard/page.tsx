@@ -42,12 +42,7 @@ import {
 
 // --- Components ---
 
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-  badge?: number;
-}
+// MenuItem interface removed because it was unused
 
 // Sidebar Component
 const Sidebar = ({ activeItem, setActiveItem, userRole }: { activeItem: string; setActiveItem: (item: string) => void; userRole: string }) => {

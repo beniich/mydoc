@@ -1,6 +1,5 @@
 import {
   type NextRequest,
-  NextResponse,
 } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 

@@ -4,7 +4,7 @@ import {
   X, 
   FileText, 
   Image, 
-  Activity, 
+  // Activity, 
   Brain,
   Send,
   Sparkles,

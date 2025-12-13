@@ -49,7 +49,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   onOpenAI,
 }) => {
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  // const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
