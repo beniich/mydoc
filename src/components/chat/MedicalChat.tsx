@@ -15,7 +15,7 @@ const MedicalChat: React.FC = () => {
   const [isAIOpen, setIsAIOpen] = useState(false);
 
   // Filter conversations based on user role (Mock logic adaptable to real data)
-  const filteredConversations = mockConversations.filter(conv => {
+  const filteredConversations = mockConversations.filter(_conv => {
     if (!user) return false;
     // Provide a default role if user.role is undefined (e.g., during development/testing)
     const userRole = user.role || 'doctor'; 

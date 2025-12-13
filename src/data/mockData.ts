@@ -151,7 +151,7 @@ export const mockMessages: Message[] = [
 ];
 
 export const mockPatientFile: PatientFile = {
-  patient: mockPatients[0],
+  patient: mockPatients[0]!,
   consultations: [
     {
       id: 'c1',

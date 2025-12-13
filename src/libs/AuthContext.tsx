@@ -8,6 +8,7 @@ interface User {
   email: string;
   name: string;
   organization?: string;
+  role?: 'doctor' | 'patient'; // Added role for chat RBAC
 }
 
 interface AuthContextType {
@@ -15,7 +16,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (email: string, password: string, name: string) => Promise<boolean>;
+  signUp: (email: string, password: string, name: string, role?: 'doctor' | 'patient') => Promise<boolean>;
   signOut: () => void;
   createOrganization: (name: string) => void;
 }
@@ -56,7 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // Get stored users
     const storedUsers = localStorage.getItem('workflow_weaver_users');
-    const users: Record<string, { passwordHash: string; name: string; organization?: string }> = 
+    const users: Record<string, { passwordHash: string; name: string; organization?: string; role?: 'doctor' | 'patient' }> = 
       storedUsers ? JSON.parse(storedUsers) : {};
 
     const passwordHash = simpleHash(password);
@@ -68,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email,
         name: userData.name,
         organization: userData.organization,
+        role: userData.role || 'doctor', // Default to doctor for existing users or if not specified
       };
       setUser(userObj);
       localStorage.setItem('workflow_weaver_user', JSON.stringify(userObj));
@@ -79,12 +81,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
-  const signUp = async (email: string, password: string, name: string): Promise<boolean> => {
+  const signUp = async (email: string, password: string, name: string, role: 'doctor' | 'patient' = 'patient'): Promise<boolean> => {
     setIsLoading(true);
 
     // Get stored users
     const storedUsers = localStorage.getItem('workflow_weaver_users');
-    const users: Record<string, { passwordHash: string; name: string; organization?: string }> = 
+    const users: Record<string, { passwordHash: string; name: string; organization?: string; role?: 'doctor' | 'patient' }> = 
       storedUsers ? JSON.parse(storedUsers) : {};
 
     // Check if user already exists
@@ -95,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Create new user
     const passwordHash = simpleHash(password);
-    users[email] = { passwordHash, name };
+    users[email] = { passwordHash, name, role };
     localStorage.setItem('workflow_weaver_users', JSON.stringify(users));
 
     // Auto sign in
@@ -103,6 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       id: simpleHash(email),
       email,
       name,
+      role,
     };
     setUser(userObj);
     localStorage.setItem('workflow_weaver_user', JSON.stringify(userObj));
@@ -126,8 +129,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const storedUsers = localStorage.getItem('workflow_weaver_users');
       const users: Record<string, { passwordHash: string; name: string; organization?: string }> = 
         storedUsers ? JSON.parse(storedUsers) : {};
-      if (users[user.email]) {
-        users[user.email].organization = name;
+      if (user && user.email && users[user.email]) {
+        users[user.email]!.organization = name;
         localStorage.setItem('workflow_weaver_users', JSON.stringify(users));
       }
     }
