@@ -22,6 +22,7 @@ import {
   ArrowUp,
   ArrowDown,
   LogOut,
+  Stethoscope,
   LucideIcon
 } from 'lucide-react';
 import {
@@ -49,22 +50,35 @@ interface MenuItem {
 }
 
 // Sidebar Component
-const Sidebar = ({ activeItem, setActiveItem }: { activeItem: string; setActiveItem: (item: string) => void }) => {
-  const menuItems: { MAINS: MenuItem[]; HELP: MenuItem[] } = {
-    MAINS: [
+const Sidebar = ({ activeItem, setActiveItem, userRole }: { activeItem: string; setActiveItem: (item: string) => void; userRole: string }) => {
+  const baseMains = [
       { id: 'overview', label: 'Overview', icon: LayoutDashboard },
       { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
       { id: 'spreadsheets', label: 'Spreadsheets', icon: FileSpreadsheet },
       { id: 'administration', label: 'Administration', icon: Shield },
       { id: 'sales', label: 'Sales', icon: DollarSign },
       { id: 'schedule', label: 'Schedule', icon: Calendar },
-    ],
-    HELP: [
+  ];
+
+  const helpItems = [
       { id: 'messages', label: 'Messages', icon: MessageSquare, badge: 3 },
       { id: 'library', label: 'Library', icon: BookOpen },
       { id: 'settings', label: 'Settings', icon: Settings },
       { id: 'support', label: 'Support', icon: HelpCircle },
-    ],
+  ];
+
+  let displayMains = [...baseMains];
+
+  if (userRole === 'client') {
+      displayMains = baseMains.filter(item => ['overview', 'schedule'].includes(item.id));
+      displayMains.push({ id: 'doctors', label: 'Find a Doctor', icon: Stethoscope });
+  } else if (userRole === 'doctor') {
+      displayMains = baseMains.filter(item => ['overview', 'schedule'].includes(item.id));
+  }
+
+  const menuItems = {
+      MAINS: displayMains,
+      HELP: helpItems
   };
 
   return (
@@ -415,6 +429,8 @@ import { SalesContent, ScheduleContent } from "@/components/dashboard/Additional
 import { AdministrationContent } from '@/components/dashboard/Administration';
 import { LeaderboardContent } from '@/components/dashboard/Leaderboard';
 import { SpreadsheetsContent } from '@/components/dashboard/Spreadsheets';
+import { MessagesContent, LibraryContent, SettingsContent } from '@/components/dashboard/InteractivePages';
+import { DoctorsList } from '@/components/dashboard/DoctorsList';
 
 // Main Dashboard Page
 // Main Dashboard Page
@@ -447,7 +463,7 @@ export default function DashboardPage() {
       {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
 
       {/* Sidebar - Conditional based on role could be added here, keeping default for now */}
-      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
+      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} userRole={userRole} />
 
       {/* Main Content */}
       <div className="pl-64 transition-all duration-300">
@@ -512,12 +528,16 @@ export default function DashboardPage() {
               <>
                 {activeItem === 'overview' && <OverviewContent onAction={handleShowToast} />}
                 {activeItem === 'leaderboard' && <LeaderboardContent />}
-                {activeItem === 'spreadsheets' && <SpreadsheetsContent />}
-                {activeItem === 'administration' && <AdministrationContent />}
-                {activeItem === 'sales' && <SalesContent />}
-                {activeItem === 'schedule' && <ScheduleContent />}
+                {activeItem === 'spreadsheets' && <SpreadsheetsContent onAction={handleShowToast} />}
+                {activeItem === 'administration' && <AdministrationContent onAction={handleShowToast} />}
+                {activeItem === 'sales' && <SalesContent onAction={handleShowToast} />}
+                {activeItem === 'schedule' && <ScheduleContent onAction={handleShowToast} />}
+                {activeItem === 'messages' && <MessagesContent />}
+                {activeItem === 'library' && <LibraryContent />}
+                {activeItem === 'settings' && <SettingsContent onAction={handleShowToast} />}
+                
                 {/* Fallback for others not yet custom built */}
-                {['messages', 'library', 'settings', 'support'].includes(activeItem) && (
+                {['support'].includes(activeItem) && (
                     <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />
                 )}
               </>
@@ -526,8 +546,11 @@ export default function DashboardPage() {
           {userRole === 'doctor' && (
               // Doctor sees specialized dashboard for overview, but might reuse schedule
                <>
-                {activeItem === 'overview' ? <DoctorDashboard /> : 
-                 activeItem === 'schedule' ? <ScheduleContent /> :
+                {activeItem === 'overview' ? <DoctorDashboard onAction={handleShowToast} /> : 
+                 activeItem === 'schedule' ? <ScheduleContent onAction={handleShowToast} /> :
+                 activeItem === 'messages' ? <MessagesContent /> :
+                 activeItem === 'library' ? <LibraryContent /> :
+                 activeItem === 'settings' ? <SettingsContent onAction={handleShowToast} /> :
                  /* Fallback */
                  <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />
                 }
@@ -538,6 +561,11 @@ export default function DashboardPage() {
               // Client sees specialized dashboard
                <>
                 {activeItem === 'overview' ? <ClientDashboard /> : 
+                 activeItem === 'schedule' ? <ScheduleContent onAction={handleShowToast} /> :
+                 activeItem === 'messages' ? <MessagesContent /> :
+                 activeItem === 'library' ? <LibraryContent /> :
+                 activeItem === 'settings' ? <SettingsContent onAction={handleShowToast} /> :
+                 activeItem === 'doctors' ? <DoctorsList onAction={handleShowToast} /> :
                  /* Client typically has restricted access, so we might redirect or show simplified views. 
                     For now, reusing placeholder for non-overview. */
                  <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />

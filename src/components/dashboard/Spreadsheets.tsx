@@ -15,7 +15,7 @@ const tableData = [
   { id: "ORD-007", date: "Oct 21, 2023", customer: "Alpha Stream", status: "Processing", amount: "$5,600.00", items: 15 },
 ];
 
-export function SpreadsheetsContent() {
+export function SpreadsheetsContent({ onAction }: { onAction?: (msg: string) => void }) {
   return (
     <div className="space-y-6 animate-in fade-in zoom-in duration-300">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -27,7 +27,10 @@ export function SpreadsheetsContent() {
             <Button variant="outline" className="gap-2">
                 <Download className="h-4 w-4" /> Export
             </Button>
-            <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Button 
+                className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+                onClick={() => onAction && onAction("New record form opening...")}
+            >
                 <Plus className="h-4 w-4" /> Add Record
             </Button>
         </div>

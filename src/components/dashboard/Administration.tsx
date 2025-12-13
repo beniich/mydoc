@@ -11,7 +11,7 @@ const users = [
     { name: "Mike Johnson", email: "mike@example.com", role: "Viewer", status: "Inactive", avatar: "/avatars/08.png" },
 ];
 
-export function AdministrationContent() {
+export function AdministrationContent({ onAction }: { onAction?: (msg: string) => void }) {
   return (
     <div className="space-y-6 animate-in fade-in zoom-in duration-300">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -20,8 +20,11 @@ export function AdministrationContent() {
           <p className="text-muted-foreground">System settings and user management</p>
         </div>
         <div className="flex gap-2">
-            <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
-                <UserPlus className="h-4 w-4" /> Invite User
+            <Button variant="outline" className="gap-2" onClick={() => onAction && onAction("Role creation dialog...")}>
+                <Shield className="h-4 w-4" /> Add Role
+            </Button>
+            <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground" onClick={() => onAction && onAction("User invitation sent!")}>
+                <Users className="h-4 w-4" /> Invite User
             </Button>
         </div>
       </div>

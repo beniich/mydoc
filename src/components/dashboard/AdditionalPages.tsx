@@ -80,7 +80,7 @@ export function SalesContent() {
 }
 
 // Calendar / Schedule Component
-export function ScheduleContent() {
+export function ScheduleContent({ onAction }: { onAction?: (msg: string) => void }) {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const timeSlots = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00'];
 
@@ -95,7 +95,10 @@ export function ScheduleContent() {
                     <Button variant="outline" className="gap-2">
                          Today
                     </Button>
-                    <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Button 
+                        className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+                        onClick={() => onAction && onAction("Event creation dialog opening...")}
+                    >
                         <CalendarIcon className="h-4 w-4" /> Add Event
                     </Button>
                 </div>

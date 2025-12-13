@@ -2,15 +2,20 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, FileText, Activity } from "lucide-react";
+import { DoctorTools } from '@/components/dashboard/DoctorTools';
 
 // DOCTOR VIEW COMPONENTS
-export function DoctorDashboard() {
+export function DoctorDashboard({ onAction }: { onAction?: (msg: string) => void }) {
   return (
     <div className="space-y-6 animate-in fade-in zoom-in duration-300">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      {/* New Doctor Tools Section */}
+      <DoctorTools onAction={onAction} />
+
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-6 border-t border-border">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Doctor Workspace</h1>
-          <p className="text-muted-foreground">Welcome back, Dr. Smith. You have 5 appointments today.</p>
+          <h2 className="text-xl font-bold text-foreground">Overview & Stats</h2>
+          <p className="text-muted-foreground">Quick summary of your practice today.</p>
         </div>
         <Button className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground">
             <Calendar className="h-4 w-4" /> View Calendar
