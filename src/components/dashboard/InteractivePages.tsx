@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Mail, Search, Paperclip, Send, MoreVertical, FileText, Image, Film, Upload, Trash2, Bell, Shield, User, Globe, Moon, Sun, Monitor, CreditCard } from 'lucide-react';
+import { Mail, Search, Paperclip, Send, MoreVertical, FileText, Image, Film, Upload, Trash2, Bell, User, Moon, Sun, Monitor, CreditCard } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 // --- Shared Components ---
@@ -17,11 +17,37 @@ const PageHeader = ({ title, description, action }: { title: string, description
 // --- Messages Page ---
 export function MessagesContent() {
     const [selectedChat, setSelectedChat] = useState<number | null>(null);
+    const [inputValue, setInputValue] = useState("");
+    const [messages, setMessages] = useState([
+        { id: 1, text: "Hi! I noticed the new dashboard layout. Looks great!", sender: 'them', time: '10:00 AM' },
+        { id: 2, text: "Thanks! We just pushed the update. Let me know if you find any bugs.", sender: 'me', time: '10:05 AM' }
+    ]);
+
     const chats = [
         { id: 1, name: "Alice Johnson", preview: "Hey, can we check the sales report?", time: "2m ago", unread: true, avatar: "AJ" },
         { id: 2, name: "Bob Smith", preview: "Meeting rescheduled to 3 PM.", time: "1h ago", unread: false, avatar: "BS" },
         { id: 3, name: "Carol White", preview: "The new design assets are ready.", time: "1d ago", unread: false, avatar: "CW" },
     ];
+
+    const handleSendMessage = () => {
+        if (!inputValue.trim()) return;
+        
+        const newMessage = {
+            id: messages.length + 1,
+            text: inputValue,
+            sender: 'me',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        setMessages([...messages, newMessage]);
+        setInputValue("");
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSendMessage();
+        }
+    };
 
     return (
         <div className="h-[calc(100vh-8rem)] flex flex-col animate-in fade-in duration-300">
@@ -81,16 +107,14 @@ export function MessagesContent() {
                                 <button className="p-2 hover:bg-muted rounded-full text-muted-foreground"><MoreVertical className="w-5 h-5" /></button>
                             </div>
                             <div className="flex-1 p-6 overflow-y-auto space-y-4">
-                                <div className="flex justify-start">
-                                    <div className="bg-muted p-3 rounded-2xl rounded-tl-none max-w-[80%] text-sm">
-                                        Hi! I noticed the new dashboard layout. Looks great!
+                                {messages.map((msg) => (
+                                    <div key={msg.id} className={`flex ${msg.sender === 'me' ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`p-3 rounded-2xl max-w-[80%] text-sm ${msg.sender === 'me' ? 'bg-primary text-primary-foreground rounded-tr-none' : 'bg-muted rounded-tl-none'}`}>
+                                            {msg.text}
+                                            <p className={`text-[10px] mt-1 ${msg.sender === 'me' ? 'text-primary-foreground/70' : 'text-muted-foreground'} text-right`}>{msg.time}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex justify-end">
-                                    <div className="bg-primary text-primary-foreground p-3 rounded-2xl rounded-tr-none max-w-[80%] text-sm">
-                                        Thanks! We just pushed the update. Let me know if you find any bugs.
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                             <div className="p-4 bg-card border-t border-border">
                                 <div className="flex items-center gap-2">
@@ -98,8 +122,16 @@ export function MessagesContent() {
                                     <input 
                                         className="flex-1 bg-muted px-4 py-2 rounded-full focus:outline-none focus:ring-1 focus:ring-primary"
                                         placeholder="Type a message..."
+                                        value={inputValue}
+                                        onChange={(e) => setInputValue(e.target.value)}
+                                        onKeyDown={handleKeyDown}
                                     />
-                                    <button className="p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90"><Send className="w-5 h-5" /></button>
+                                    <button 
+                                        onClick={handleSendMessage}
+                                        className="p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-transform active:scale-95"
+                                    >
+                                        <Send className="w-5 h-5" />
+                                    </button>
                                 </div>
                             </div>
                         </>
