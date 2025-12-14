@@ -1,29 +1,17 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/libs/AuthContext';
-import { useTheme } from 'next-themes';
+// import { useTheme } from 'next-themes';
 import {
-  LayoutDashboard,
-  Trophy,
-  FileSpreadsheet,
   Shield,
   DollarSign,
-  Calendar,
-  MessageSquare,
-  BookOpen,
-  Settings,
-  HelpCircle,
   Search,
   Bell,
-  Sun,
-  Moon,
   Download,
   ArrowUp,
-  ArrowDown,
-  LogOut,
-  Stethoscope,
-  LucideIcon
+  ArrowDown
 } from 'lucide-react';
 import {
   LineChart,
@@ -45,89 +33,9 @@ import {
 // MenuItem interface removed because it was unused
 
 // Sidebar Component
-const Sidebar = ({ activeItem, setActiveItem, userRole }: { activeItem: string; setActiveItem: (item: string) => void; userRole: string }) => {
-  const baseMains = [
-      { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-      { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
-      { id: 'spreadsheets', label: 'Spreadsheets', icon: FileSpreadsheet },
-      { id: 'administration', label: 'Administration', icon: Shield },
-      { id: 'sales', label: 'Sales', icon: DollarSign },
-      { id: 'schedule', label: 'Schedule', icon: Calendar },
-  ];
-
-  const helpItems = [
-      { id: 'messages', label: 'Messages', icon: MessageSquare, badge: 3 },
-      { id: 'library', label: 'Library', icon: BookOpen },
-      { id: 'settings', label: 'Settings', icon: Settings },
-      { id: 'support', label: 'Support', icon: HelpCircle },
-  ];
-
-  let displayMains = [...baseMains];
-
-  if (userRole === 'patient') {
-      displayMains = baseMains.filter(item => ['overview', 'schedule'].includes(item.id));
-      displayMains.push({ id: 'doctors', label: 'Find a Doctor', icon: Stethoscope });
-  } else if (userRole === 'doctor') {
-      displayMains = baseMains.filter(item => ['overview', 'schedule'].includes(item.id));
-  }
-
-  const menuItems = {
-      MAINS: displayMains,
-      HELP: helpItems
-  };
-
-  return (
-    <aside className="w-64 bg-card border-r border-border h-screen fixed left-0 top-0 flex flex-col z-20">
-      {/* Logo */}
-      <div className="p-6 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-            <span className="text-primary-foreground text-xl font-bold">W</span>
-          </div>
-          <span className="text-xl font-bold text-foreground">Workflow</span>
-        </div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 p-4 overflow-y-auto">
-        {Object.entries(menuItems).map(([section, items]) => (
-          <div key={section} className="mb-6">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-3">
-              {section}
-            </h3>
-            <ul className="space-y-1">
-              {items.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <li key={item.id}>
-                    <button
-                      onClick={() => setActiveItem(item.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer active:scale-95 ${
-                        activeItem === item.id
-                          ? 'bg-primary/10 text-primary'
-                          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-                      }`}
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span>{item.label}</span>
-                      {item.badge && (
-                        <span className="ml-auto bg-destructive text-destructive-foreground text-xs px-2 py-0.5 rounded-full">
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
-      </nav>
-
-      {/* User Logic could go here or bottom links */}
-    </aside>
-  );
-};
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { DashboardHeader } from "@/components/layout/DashboardHeader";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 // Stats Card Component
 const StatsCard = ({ title, value, change, positive, comparison, icon: Icon, colorClass }: { title: string, value: string, change: string, positive: boolean, comparison: string, icon: React.ElementType, colorClass: string }) => (
@@ -424,15 +332,16 @@ import { SalesContent, ScheduleContent } from "@/components/dashboard/Additional
 import { AdministrationContent } from '@/components/dashboard/Administration';
 import { LeaderboardContent } from '@/components/dashboard/Leaderboard';
 import { SpreadsheetsContent } from '@/components/dashboard/Spreadsheets';
-import { MessagesContent, LibraryContent, SettingsContent } from '@/components/dashboard/InteractivePages';
+import MedicalChat from '@/components/chat/MedicalChat';
+import { LibraryContent, MessagesContent, SettingsContent } from '@/components/dashboard/InteractivePages';
 import { DoctorsList } from '@/components/dashboard/DoctorsList';
 
 // Main Dashboard Page
 // Main Dashboard Page
 export default function DashboardPage() {
   const [activeItem, setActiveItem] = useState('overview');
-  const { user, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { user } = useAuth();
+  // const { theme, setTheme } = useTheme();
   
   // Use real user role or default to 'doctor' if undefined (safe fallback)
   const userRole = user?.role || 'doctor';
@@ -453,112 +362,47 @@ export default function DashboardPage() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 relative">
-      {/* Toast Notification */}
-      {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
+    <SidebarProvider>
+      <div className="flex min-h-screen w-full bg-background">
+        {/* Toast Notification */}
+        {toastMessage && <Toast message={toastMessage} onClose={() => setToastMessage(null)} />}
 
-      {/* Sidebar */}
-      <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} userRole={userRole} />
+        {/* Sidebar */}
+        <DashboardSidebar activeItem={activeItem} setActiveItem={setActiveItem} userRole={userRole} />
 
-      {/* Main Content */}
-      <div className="pl-64 transition-all duration-300">
-        {/* Header */}
-        <header className="bg-card/80 backdrop-blur-md border-b border-border px-6 py-4 sticky top-0 z-50">
-          <div className="flex items-center justify-between">
-            {/* Search */}
-            <div className="relative w-80 hidden md:block">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-muted/50 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium text-sm"
-              />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            </div>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {/* Header */}
+          <DashboardHeader />
 
-            {/* Actions */}
-            <div className="flex items-center gap-4 ml-auto">
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors cursor-pointer active:scale-95"
-              >
-                {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
+          {/* Content Area */}
+          <main className="flex-1 overflow-y-auto p-6 bg-background/50">
+            {/* Overview - Role specific defaults, but accessible */}
+            {activeItem === 'overview' && (
+                userRole === 'patient' ? <ClientDashboard /> :
+                userRole === 'doctor' ? <DoctorDashboard onAction={handleShowToast} /> :
+                <OverviewContent onAction={handleShowToast} />
+            )}
 
-              <button 
-                onClick={() => handleShowToast("You have 3 unread notifications")}
-                className="relative p-2 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors cursor-pointer active:scale-95"
-              >
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-background"></span>
-              </button>
-              
-              <div className="flex items-center gap-3 pl-4 border-l border-border/50">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-primary-foreground font-bold shadow-lg">
-                  {user?.name?.[0]?.toUpperCase() || 'U'}
-                </div>
-                <div className="hidden sm:block text-sm">
-                  <p className="font-semibold text-foreground">{user?.name || 'User'}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{userRole}</p>
-                </div>
-                <button onClick={signOut} className="ml-2 text-muted-foreground hover:text-destructive transition-colors cursor-pointer active:scale-95">
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Content Area */}
-        <main className="p-6">
-          {/* Render based on Role, then by Active Item */}
-          {/* Default/Admin View (showing mostly admin stuff for 'doctor' as well if logic overlaps, or distinct) */}
-          {(userRole === 'admin' || userRole === 'doctor') && (
-              <>
-                {/* Doctor View Overrides */}
-                {userRole === 'doctor' && activeItem === 'overview' ? <DoctorDashboard onAction={handleShowToast} /> :
-                 /* Admin/Default Overview */
-                 activeItem === 'overview' ? <OverviewContent onAction={handleShowToast} /> : null
-                }
-                
-                {/* Shared Views */}
-                {activeItem === 'schedule' && <ScheduleContent onAction={handleShowToast} />}
-                {activeItem === 'messages' && <MessagesContent />}
-                {activeItem === 'library' && <LibraryContent />}
-                {activeItem === 'settings' && <SettingsContent onAction={handleShowToast} />}
-                
-                {/* Admin Only Views */}
-                {userRole === 'admin' && (
-                    <>
-                        {activeItem === 'leaderboard' && <LeaderboardContent />}
-                        {activeItem === 'spreadsheets' && <SpreadsheetsContent onAction={handleShowToast} />}
-                        {activeItem === 'administration' && <AdministrationContent onAction={handleShowToast} />}
-                        {activeItem === 'sales' && <SalesContent onAction={handleShowToast} />}
-                    </>
-                )}
-
-                {/* Fallback */}
-                {['support'].includes(activeItem) && (
-                    <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />
-                )}
-              </>
-          )}
-
-           {userRole === 'patient' && (
-              // Client sees specialized dashboard
-               <>
-                {activeItem === 'overview' ? <ClientDashboard /> : 
-                 activeItem === 'schedule' ? <ScheduleContent onAction={handleShowToast} /> :
-                 activeItem === 'messages' ? <MessagesContent /> :
-                 activeItem === 'library' ? <LibraryContent /> :
-                 activeItem === 'settings' ? <SettingsContent onAction={handleShowToast} /> :
-                 activeItem === 'doctors' ? <DoctorsList onAction={handleShowToast} /> :
-                 /* Client typically has restricted access */
-                 <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />
-                }
-               </>
-          )}
-        </main>
+            {/* All Pages Accessible to Everyone */}
+            {activeItem === 'schedule' && <ScheduleContent onAction={handleShowToast} />}
+            {activeItem === 'messages' && <MessagesContent />}
+            {activeItem === 'library' && <LibraryContent />}
+            {activeItem === 'settings' && <SettingsContent onAction={handleShowToast} />}
+            
+            {activeItem === 'leaderboard' && <LeaderboardContent />}
+            {activeItem === 'spreadsheets' && <SpreadsheetsContent onAction={handleShowToast} />}
+            {activeItem === 'administration' && <AdministrationContent onAction={handleShowToast} />}
+            {activeItem === 'sales' && <SalesContent onAction={handleShowToast} />}
+            {activeItem === 'doctors' && <DoctorsList onAction={handleShowToast} />}
+            
+            {/* Fallback */}
+            {['support'].includes(activeItem) && (
+                <PlaceholderContent title={activeItem.charAt(0).toUpperCase() + activeItem.slice(1)} />
+            )}
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }

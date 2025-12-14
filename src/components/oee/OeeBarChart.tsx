@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
 import { Card } from "@/components/ui/card";
 

@@ -15,7 +15,8 @@ import {
   FileBarChart,
   Receipt,
   Check,
-  CheckCheck
+  CheckCheck,
+  ArrowLeft
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,7 @@ interface ChatAreaProps {
   messages: Message[];
   onSendMessage: (content: string) => void;
   onOpenAI: () => void;
+  onBack?: () => void;
 }
 
 const statusIcons: Record<MessageStatus, React.ReactNode> = {
@@ -47,6 +49,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   messages,
   onSendMessage,
   onOpenAI,
+  onBack,
 }) => {
   const [input, setInput] = useState('');
   // const [isTyping, setIsTyping] = useState(false);
@@ -78,8 +81,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-background">
-        <div className="text-center animate-fade-in">
+      <div className="flex-1 flex items-center justify-center bg-background h-full">
+        <div className="text-center animate-fade-in p-4">
           <div className="w-20 h-20 rounded-full gradient-primary/20 flex items-center justify-center mx-auto mb-4">
             <Send className="w-8 h-8 text-primary" />
           </div>
@@ -95,10 +98,20 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background">
+    <div className="flex-1 flex flex-col bg-background h-full">
       {/* Header */}
-      <div className="p-4 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm">
+      <div className="p-4 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center gap-3">
+          {onBack && (
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden -ml-2 text-muted-foreground hover:text-foreground"
+              onClick={onBack}
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          )}
           <Avatar className="w-10 h-10">
             <AvatarImage src={participant?.avatar} />
             <AvatarFallback className="bg-secondary text-foreground font-medium">

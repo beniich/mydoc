@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Play, Pause, Clock, Zap, MoreVertical, ArrowRight } from "lucide-react";
+import { Play, Clock, Zap, MoreVertical, ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 
@@ -27,7 +27,7 @@ interface WorkflowCardProps {
   onRun?: () => void;
 }
 
-export function WorkflowCard({ workflow, onToggle, onEdit, onRun }: WorkflowCardProps) {
+export function WorkflowCard({ workflow, onToggle, onRun }: WorkflowCardProps) {
   const isActive = workflow.status === "active";
 
   return (

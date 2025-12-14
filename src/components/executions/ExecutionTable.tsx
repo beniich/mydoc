@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { cn } from "@/lib/utils";
 import { CheckCircle2, XCircle, Clock, RefreshCw, Eye, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";

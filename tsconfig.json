@@ -58,7 +58,9 @@
     "./node_modules/**/*",
     "**/*.spec.ts",
     "**/*.e2e.ts",
-    "pages_backup/**/*"
+    "pages_backup/**/*",
+    "crm-hub-ref/**/*",
+    "n8n-reference/**/*"
   ],
   "include": [
     "next-env.d.ts",

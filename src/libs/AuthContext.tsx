@@ -16,7 +16,8 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   signIn: (email: string, password: string) => Promise<boolean>;
-  signUp: (email: string, password: string, name: string, role?: 'doctor' | 'patient') => Promise<boolean>;
+  signUp: (email: string, password: string, name: string, role?: 'doctor' | 'patient' | 'admin') => Promise<boolean>;
+  signInWithGoogle: () => Promise<boolean>;
   signOut: () => void;
   createOrganization: (name: string) => void;
 }
@@ -146,6 +147,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         signUp, 
         signOut,
         createOrganization,
+        signInWithGoogle: async () => {
+          setIsLoading(true);
+          // Mock Google Sign In
+          const email = "google-user@example.com";
+          const name = "Google User";
+          const userObj: User = {
+            id: "google-123",
+            email,
+            name,
+            role: 'doctor', // Default role
+          };
+          setUser(userObj);
+          localStorage.setItem('workflow_weaver_user', JSON.stringify(userObj));
+          setIsLoading(false);
+          return true;
+        }
       }}
     >
       {children}

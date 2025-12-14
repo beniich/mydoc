@@ -6,6 +6,7 @@ import { AIAssistantModal } from '@/components/chat/AIAssistantModal';
 import { mockConversations, mockMessages, mockPatientFile, mockPatients } from '@/data/mockData';
 import { Message } from '@/types/chat';
 import { useAuth } from '@/libs/AuthContext';
+import { cn } from '@/lib/utils';
 
 const MedicalChat: React.FC = () => {
   const { user } = useAuth();
@@ -26,7 +27,7 @@ const MedicalChat: React.FC = () => {
        // Matching logic: Check if participant ID matches user ID OR (for demo) if email contains patient name
        return _conv.participants.some(p => 
          p.id === user.id || 
-         (user.email && user.email.toLowerCase().includes(p.name.split(' ')[0].toLowerCase()))
+         (user.email && user.email.toLowerCase().includes(p.name && p.name.split(' ')[0] ? p.name.split(' ')[0].toLowerCase() : ''))
        );
     }
     return true; 
@@ -40,7 +41,7 @@ const MedicalChat: React.FC = () => {
 
   useEffect(() => {
     if (!selectedConversation && filteredConversations.length > 0) {
-        setSelectedConversationId(filteredConversations[0].id);
+        setSelectedConversationId(filteredConversations[0]?.id || '');
     }
   }, [filteredConversations, selectedConversation]);
 
@@ -77,39 +78,46 @@ const MedicalChat: React.FC = () => {
   const patientFile = getPatientFile();
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex bg-background"> 
-      {/* Adjusted height for dashboard layout */}
+    <div className="h-[calc(100vh-4rem)] flex bg-background w-full overflow-hidden relative"> 
+      {/* Modified height and overflow handling to ensuring it stays within bounds */}
       
-      {/* Conversation List */}
-      <div className="w-80 flex-shrink-0 border-r">
+      {/* Conversation List - Hidden on mobile if conversation is selected */}
+      <div className={cn(
+        "w-full md:w-80 flex-shrink-0 border-r bg-background h-full absolute inset-0 md:static z-20 md:z-auto transition-transform duration-300 md:translate-x-0",
+        activeConversation && selectedConversationId ? "-translate-x-full md:translate-x-0" : "translate-x-0"
+      )}>
         <ConversationList
           conversations={filteredConversations}
           selectedId={activeConversation?.id || ''}
-          onSelect={setSelectedConversationId}
+          onSelect={(id) => setSelectedConversationId(id)}
           filter={filter}
           onFilterChange={setFilter}
         />
       </div>
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Chat Area - Full width on mobile, taking remaining space on desktop */}
+      <div className={cn(
+        "flex-1 flex flex-col min-w-0 bg-background h-full absolute inset-0 md:static z-10 md:z-auto transition-transform duration-300 md:translate-x-0",
+        activeConversation && selectedConversationId ? "translate-x-0" : "translate-x-full md:translate-x-0"
+      )}>
         {activeConversation ? (
             <ChatArea
                 conversation={activeConversation}
                 messages={conversationMessages}
                 onSendMessage={handleSendMessage}
                 onOpenAI={() => setIsAIOpen(true)}
+                onBack={() => setSelectedConversationId('')}
             />
         ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
+            <div className="flex-1 flex items-center justify-center text-muted-foreground hidden md:flex">
                 Select a conversation
             </div>
         )}
       </div>
 
-      {/* Patient Panel - Only show if we have a patient file and user is a doctor */}
+      {/* Patient Panel - Only show if we have a patient file and user is a doctor - Hidden on small screens */}
       {(user?.role === 'doctor' || !user?.role) && (
-          <div className="hidden xl:block w-80 border-l">
+          <div className="hidden xl:block w-80 border-l h-full flex-shrink-0">
             <PatientPanel
                 patientFile={patientFile}
                 onOpenAI={() => setIsAIOpen(true)}

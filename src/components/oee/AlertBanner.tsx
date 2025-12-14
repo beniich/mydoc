@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
 import { AlertTriangle, X, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";

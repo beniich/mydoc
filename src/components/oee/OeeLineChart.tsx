@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
 import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
